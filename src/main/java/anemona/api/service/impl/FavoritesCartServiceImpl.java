@@ -13,11 +13,13 @@ import anemona.api.repository.jpa.UserRepository;
 import anemona.api.service.FavoritesCartService;
 import anemona.api.service.ProductService;
 import anemona.api.service.ShoppingCartProductService;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class FavoritesCartServiceImpl implements FavoritesCartService {
 
     private final FavoritesCartRepository favoritesCartRepository;
@@ -62,6 +64,15 @@ public class FavoritesCartServiceImpl implements FavoritesCartService {
                 .stream().anyMatch(i -> i.getId().equals(productId)))
             throw new ProductAlreadyInShoppingCartException(productId, username);
         favoritesCart.getProducts().add(product);
+        return this.favoritesCartRepository.save(favoritesCart);
+    }
+
+    @Override
+    public FavoritesCart removeProductFromFavoritesCart(String username, Long productId) {
+        FavoritesCart favoritesCart = this.getActiveFavoritesCart(username);
+        Product product = this.productService.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
+        favoritesCart.getProducts().remove(product);
         return this.favoritesCartRepository.save(favoritesCart);
     }
 }

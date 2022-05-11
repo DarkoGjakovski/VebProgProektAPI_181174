@@ -4,6 +4,8 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Data
 @Entity
@@ -22,12 +24,17 @@ public class ShoppingCart {
 
     }
 
-    public ShoppingCart(List<ShoppingCartProduct> ShoppingCartProducts, User User){
-        this.shoppingCartProducts = ShoppingCartProducts;
+    public ShoppingCart(User User){
         this.user = User;
     }
 
     public void add(ShoppingCartProduct product){
         this.shoppingCartProducts.add(product);
+    }
+
+    public void remove(Long id) {this.shoppingCartProducts = this.shoppingCartProducts.stream().filter(i -> Objects.equals(i.getId(), id)).collect(Collectors.toList());}
+
+    public List<ShoppingCartProduct> getShoppingCartProducts() {
+        return shoppingCartProducts;
     }
 }

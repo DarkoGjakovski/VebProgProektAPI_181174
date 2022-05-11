@@ -9,4 +9,5 @@ public interface FavoritesCartService {
     List<Product> listAllProductsInFavoritesCart(Long cartId);
     FavoritesCart getActiveFavoritesCart(String username);
     FavoritesCart addProductToFavoritesCart(String username, Long productId);
+    FavoritesCart removeProductFromFavoritesCart(String username, Long productId);
 }

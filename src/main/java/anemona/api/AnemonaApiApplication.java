@@ -13,4 +13,10 @@ public class AnemonaApiApplication {
         SpringApplication.run(AnemonaApiApplication.class, args);
     }
 
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(10);
+    }
+
+
 }
