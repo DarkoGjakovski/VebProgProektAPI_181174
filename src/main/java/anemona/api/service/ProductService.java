@@ -17,6 +17,10 @@ public interface ProductService {
 
     List<Product> findByCategory(String category);
 
+    List<Product> searchByQuery(String query);
+
+    List<Product> filterProducts(String Occasion, String color);
+
     Optional<Product> save(Product product);
 
     Optional<Product> edit(Long id, Product product);

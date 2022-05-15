@@ -18,9 +18,20 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     private ResponseEntity<List<Product>> findAll(@RequestParam("c") String category) {
         return ResponseEntity.ok().body(this.productService.findByCategory(category));
+    }
+
+    @GetMapping("/search")
+    private ResponseEntity<List<Product>> search(@RequestParam("q") String query) {
+        return ResponseEntity.ok().body(this.productService.searchByQuery(query));
+    }
+
+    @GetMapping("/filter")
+    private ResponseEntity<List<Product>> filter(@RequestParam(value = "o", required = false) String occasion,
+                                                 @RequestParam(value = "co", required = false) String color) {
+        return ResponseEntity.ok().body(this.productService.filterProducts(occasion,color));
     }
 
     @GetMapping("/{id}")

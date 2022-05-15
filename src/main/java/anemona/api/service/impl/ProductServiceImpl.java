@@ -10,8 +10,10 @@ import anemona.api.service.ProductService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,27 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> findByCategory(String category) {
         List<Product> allProducts = this.productRepository.findAll();
         allProducts = allProducts.stream().filter(i -> i.getCategories().stream().anyMatch(j -> j.getName().equals(category))).collect(Collectors.toList());
+        return allProducts;
+    }
+
+    @Override
+    public List<Product> searchByQuery(String query) {
+        List<Product> allProducts = this.productRepository.findAll();
+        allProducts = allProducts.stream().filter(i -> i.getTitle().toLowerCase().contains(query.toLowerCase())).collect(Collectors.toList());
+        return allProducts;
+    }
+
+    @Override
+    public List<Product> filterProducts(String Occasion, String color) {
+        List<Product> allProducts = this.productRepository.findAll();
+        if(!Objects.equals(Occasion, "") && !Objects.equals(color, "")){
+            allProducts = allProducts.stream().filter(i -> i.getCategories().stream().anyMatch(j -> j.getName().equals(Occasion))).collect(Collectors.toList());
+            allProducts = allProducts.stream().filter(i -> i.getCategories().stream().anyMatch(j -> j.getName().equals(color))).collect(Collectors.toList());
+        }else if(Occasion == ""){
+            allProducts = allProducts.stream().filter(i -> i.getCategories().stream().anyMatch(j -> j.getName().equals(color))).collect(Collectors.toList());
+        }else{
+            allProducts = allProducts.stream().filter(i -> i.getCategories().stream().anyMatch(j -> j.getName().equals(Occasion))).collect(Collectors.toList());
+        }
         return allProducts;
     }
 
