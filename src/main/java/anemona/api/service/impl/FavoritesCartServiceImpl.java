@@ -2,36 +2,34 @@ package anemona.api.service.impl;
 
 import anemona.api.model.FavoritesCart;
 import anemona.api.model.Product;
-import anemona.api.model.User;
+import anemona.api.model.ShoppingCart;
+import anemona.api.model.ShoppingCartProduct;
 import anemona.api.model.exceptions.ProductAlreadyInShoppingCartException;
 import anemona.api.model.exceptions.ProductNotFoundException;
 import anemona.api.model.exceptions.ShoppingCartNotFoundException;
 import anemona.api.model.exceptions.UserNotFoundException;
 import anemona.api.repository.jpa.FavoritesCartRepository;
-import anemona.api.repository.jpa.ShoppingCartRepository;
-import anemona.api.repository.jpa.UserRepository;
 import anemona.api.service.FavoritesCartService;
 import anemona.api.service.ProductService;
-import anemona.api.service.ShoppingCartProductService;
+import anemona.api.service.RegistrationService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FavoritesCartServiceImpl implements FavoritesCartService {
 
     private final FavoritesCartRepository favoritesCartRepository;
-    private final UserRepository userRepository;
     private final ProductService productService;
+    private final RegistrationService registrationService;
 
     public FavoritesCartServiceImpl(FavoritesCartRepository favoritesCartRepository,
-                                   UserRepository userRepository,
-                                   ProductService productService) {
+                                   ProductService productService,
+                                    RegistrationService registrationService) {
         this.favoritesCartRepository = favoritesCartRepository;
-        this.userRepository = userRepository;
         this.productService = productService;
+        this.registrationService = registrationService;
     }
 
     @Override
@@ -42,37 +40,39 @@ public class FavoritesCartServiceImpl implements FavoritesCartService {
     }
 
     @Override
-    public FavoritesCart getActiveFavoritesCart(String username) {
-        User user = this.userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(username));
-
-        return this.favoritesCartRepository
-                .findByUser(user)
-                .orElseGet(() -> {
-                    FavoritesCart cart = new FavoritesCart(new ArrayList<>(), user);
-                    return this.favoritesCartRepository.save(cart);
-                });
-
+    public FavoritesCart getActiveFavoritesCart(int userId) {
+        return this.favoritesCartRepository.findByUser(this.registrationService.fetchUserById(userId));
     }
 
     @Override
-    public FavoritesCart addProductToFavoritesCart(String username, Long productId) {
-        FavoritesCart favoritesCart = this.getActiveFavoritesCart(username);
+    public FavoritesCart addProductToFavoritesCart(int userId, Long productId) {
+        FavoritesCart favoritesCart = this.getActiveFavoritesCart(userId);
+        if(favoritesCart == null){
+            this.favoritesCartRepository.save(new FavoritesCart(this.registrationService.fetchUserById(userId)));
+            favoritesCart = this.favoritesCartRepository.findByUser(this.registrationService.fetchUserById(userId));
+        }
+
         Product product = this.productService.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
-        if(favoritesCart.getProducts()
-                .stream().anyMatch(i -> i.getId().equals(productId)))
-            throw new ProductAlreadyInShoppingCartException(productId, username);
-        favoritesCart.getProducts().add(product);
-        return this.favoritesCartRepository.save(favoritesCart);
+
+        favoritesCart.addProduct(product);
+        this.favoritesCartRepository.save(favoritesCart);
+        return favoritesCart;
     }
 
     @Override
-    public FavoritesCart removeProductFromFavoritesCart(String username, Long productId) {
-        FavoritesCart favoritesCart = this.getActiveFavoritesCart(username);
+    public FavoritesCart removeProductFromFavoritesCart(int userId, Long productId) {
+        FavoritesCart favoritesCart = this.getActiveFavoritesCart(userId);
+        if(favoritesCart == null){
+            this.favoritesCartRepository.save(new FavoritesCart(this.registrationService.fetchUserById(userId)));
+            favoritesCart = this.favoritesCartRepository.findByUser(this.registrationService.fetchUserById(userId));
+        }
+
         Product product = this.productService.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
-        favoritesCart.getProducts().remove(product);
-        return this.favoritesCartRepository.save(favoritesCart);
+
+        favoritesCart.removeProduct(product);
+        this.favoritesCartRepository.save(favoritesCart);
+        return favoritesCart;
     }
 }

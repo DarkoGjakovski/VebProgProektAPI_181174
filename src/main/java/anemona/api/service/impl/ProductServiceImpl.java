@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -39,6 +40,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Optional<Product> findByName(String name) {
         return this.productRepository.findByTitle(name);
+    }
+
+    @Override
+    public List<Product> findByCategory(String category) {
+        List<Product> allProducts = this.productRepository.findAll();
+        allProducts = allProducts.stream().filter(i -> i.getCategories().stream().anyMatch(j -> j.getName().equals(category))).collect(Collectors.toList());
+        return allProducts;
     }
 
     @Override

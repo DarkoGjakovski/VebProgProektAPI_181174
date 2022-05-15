@@ -15,7 +15,14 @@ public class ShoppingCartProductServiceImpl implements ShoppingCartProductServic
     }
 
     @Override
+    public ShoppingCartProduct save(ShoppingCartProduct shoppingCartProduct) {
+        return this.shoppingCartProductRepository.save(shoppingCartProduct);
+    }
+
+    @Override
     public ShoppingCartProduct getShoppingCartProduct(Long id) {
         return this.shoppingCartProductRepository.getById(id);
     }
+
+
 }

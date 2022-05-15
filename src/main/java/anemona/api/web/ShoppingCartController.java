@@ -8,15 +8,14 @@ import anemona.api.service.FavoritesCartService;
 import anemona.api.service.ProductService;
 import anemona.api.service.ShoppingCartProductService;
 import anemona.api.service.ShoppingCartService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/shopping-cart")
 public class ShoppingCartController {
 
@@ -31,46 +30,31 @@ public class ShoppingCartController {
     }
 
     @GetMapping
-    private ResponseEntity<List<ShoppingCartProduct>> findAll() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = "";
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-        ShoppingCart sc = this.shoppingCartService.getActiveShoppingCart(username);
-        System.out.println(sc);
-        return ResponseEntity.ok().body(sc.getShoppingCartProducts());
+    private ResponseEntity<List<ShoppingCartProduct>> findAll(@RequestParam("userId") int userId) {
+        return ResponseEntity.ok().body(this.shoppingCartService.listAllProductsInShoppingCart(this.shoppingCartService.getActiveShoppingCart(userId).getShoppingCartId()));
     }
 
-    @PutMapping("/add/{id}")
-    public ResponseEntity<ShoppingCartProduct> save(@PathVariable Long id) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = "";
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-        ShoppingCart sc = this.shoppingCartService.getActiveShoppingCart(username);
-        ShoppingCartProduct scp = this.shoppingCartProductService.getShoppingCartProduct(id);
-        this.shoppingCartService.addProductToShoppingCart(username,scp.getId());
+    @PostMapping("/add")
+    public ResponseEntity<ShoppingCartProduct> save(@RequestBody ObjectNode obj) {
+        int userId = obj.get("userId").asInt();
+        long productId =  obj.get("productId").asLong();
+        this.shoppingCartService.addProductToShoppingCart(userId,productId);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/remove/{id}")
-    public ResponseEntity<ShoppingCartProduct> remove(@PathVariable Long id) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = "";
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-        ShoppingCart sc = this.shoppingCartService.getActiveShoppingCart(username);
-        ShoppingCartProduct scp = this.shoppingCartProductService.getShoppingCartProduct(id);
-        this.shoppingCartService.removeProductFromShoppingCart(username,scp.getId());
+    @PostMapping("/remove")
+    public ResponseEntity<ShoppingCartProduct> remove(@RequestBody ObjectNode obj) {
+        int userId = obj.get("userId").asInt();
+        long productId =  obj.get("productId").asLong();
+        this.shoppingCartService.removeProductFromShoppingCart(userId,productId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<ShoppingCartProduct> delete(@RequestBody ObjectNode obj) {
+        int userId = obj.get("userId").asInt();
+        long productId =  obj.get("productId").asLong();
+        this.shoppingCartService.deleteProductFromShoppingCart(userId,productId);
         return ResponseEntity.ok().build();
     }
 

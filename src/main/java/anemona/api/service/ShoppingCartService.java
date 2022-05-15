@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface ShoppingCartService {
     List<ShoppingCartProduct> listAllProductsInShoppingCart(Long cartId);
-    ShoppingCart getActiveShoppingCart(String username);
-    ShoppingCart addProductToShoppingCart(String username, Long productId);
-    ShoppingCart removeProductFromShoppingCart(String username, Long id);
+    ShoppingCart getActiveShoppingCart(int userid);
+    ShoppingCart addProductToShoppingCart(int userId, Long productId);
+    ShoppingCart removeProductFromShoppingCart(int userId, Long id);
+    ShoppingCart deleteProductFromShoppingCart(int userId, Long id);
 }

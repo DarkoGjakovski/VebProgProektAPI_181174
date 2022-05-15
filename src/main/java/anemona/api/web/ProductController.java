@@ -19,8 +19,8 @@ public class ProductController {
     }
 
     @GetMapping
-    private List<Product> findAll() {
-        return this.productService.findAll();
+    private ResponseEntity<List<Product>> findAll(@RequestParam("c") String category) {
+        return ResponseEntity.ok().body(this.productService.findByCategory(category));
     }
 
     @GetMapping("/{id}")

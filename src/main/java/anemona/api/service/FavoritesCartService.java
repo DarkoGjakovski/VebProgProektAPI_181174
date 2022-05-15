@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FavoritesCartService {
     List<Product> listAllProductsInFavoritesCart(Long cartId);
-    FavoritesCart getActiveFavoritesCart(String username);
-    FavoritesCart addProductToFavoritesCart(String username, Long productId);
-    FavoritesCart removeProductFromFavoritesCart(String username, Long productId);
+    FavoritesCart getActiveFavoritesCart(int userId);
+    FavoritesCart addProductToFavoritesCart(int userId, Long productId);
+    FavoritesCart removeProductFromFavoritesCart(int userId, Long productId);
 }

@@ -3,6 +3,7 @@ package anemona.api.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -12,9 +13,10 @@ import java.util.stream.Collectors;
 public class ShoppingCart {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long shoppingCartId;
 
-    @OneToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<ShoppingCartProduct> shoppingCartProducts;
 
     @OneToOne
@@ -26,11 +28,14 @@ public class ShoppingCart {
 
     public ShoppingCart(User User){
         this.user = User;
+        this.shoppingCartProducts = new ArrayList<>();
     }
 
-    public void add(ShoppingCartProduct product){
+    public void addProduct(ShoppingCartProduct product){
         this.shoppingCartProducts.add(product);
     }
+
+    public void removeProduct(ShoppingCartProduct product) {this.shoppingCartProducts.remove(product);}
 
     public void remove(Long id) {this.shoppingCartProducts = this.shoppingCartProducts.stream().filter(i -> Objects.equals(i.getId(), id)).collect(Collectors.toList());}
 

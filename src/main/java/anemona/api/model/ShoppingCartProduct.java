@@ -10,13 +10,11 @@ import java.util.List;
 public class ShoppingCartProduct {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
     private Product product;
-
-    @OneToMany
-    private List<ShoppingCart> shoppingCartsPerProduct;
 
     private Integer quantity;
 

@@ -15,6 +15,8 @@ public interface ProductService {
 
     Optional<Product> findByName(String name);
 
+    List<Product> findByCategory(String category);
+
     Optional<Product> save(Product product);
 
     Optional<Product> edit(Long id, Product product);
